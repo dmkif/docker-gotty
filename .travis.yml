@@ -2,7 +2,14 @@ sudo: required
  
 services:
  - docker
-
+addons:
+  apt:
+    packages:
+    - qemu 
+    - qemu-user-static 
+    - qemu-user 
+    - binfmt-support
+    
 env:
   matrix:
     - ARCH=s390x
@@ -11,8 +18,8 @@ before_install:
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker run --rm --privileged multiarch/qemu-user-static:register
-    - ls /usr/bin
-    - cp /usr/bin/qemu-s390-static .
+    - cp /usr/bin/qemu-*-static .
+    - ls -la
     - docker build --compress -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
