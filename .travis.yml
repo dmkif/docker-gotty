@@ -5,7 +5,8 @@ addons:
     packages:
     - qemu 
     - qemu-user-static 
-    - qemu-user 
+    - qemu-user
+    - qemu-system-s390x   
     - binfmt-support
 
 services:
@@ -18,7 +19,7 @@ env:
 before_install:
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
-    - update-binfmts --enable "${ARCH}"
+    - sudo update-binfmts --enable qemu-"${ARCH}"
     - docker build --compress -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
