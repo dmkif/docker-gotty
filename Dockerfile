@@ -2,7 +2,6 @@ FROM @@ARCH@@/debian:jessie
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
 COPY ./qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
 # Install packages necessary to run EAP
-RUN uname -a  
 RUN apt-get update && \
     apt-get -y install curl tar xterm libncurses5-dev libgmp-dev && \
     apt-get -y autoremove && \
