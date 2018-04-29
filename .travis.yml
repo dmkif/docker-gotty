@@ -1,5 +1,13 @@
 sudo: required
 
+addons:
+  apt:
+    packages:
+    - qemu 
+    - qemu-user-static 
+    - qemu-user 
+    - binfmt-support
+
 services:
  - docker
 
@@ -10,6 +18,7 @@ env:
 before_install:
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
+    - update-binfmts --enable "${ARCH}"
     - docker build --compress -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
