@@ -1,13 +1,13 @@
-#!/bin/bash
-FROM s390x/debian:jessie
+FROM $__{ARCH}/debian:jessie
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
-COPY ./qemu-s390x-static /usr/bin/qemu-s390x-static
+COPY ./qemu-$__{ARCH}-static /usr/bin/qemu-$__{ARCH}-static
 # Install packages necessary to run EAP
 RUN uname -a  
 RUN apt-get update && \
     apt-get -y install curl tar xterm libncurses5-dev libgmp-dev && \
     apt-get -y autoremove && \
-    apt-get -y clean 
+    apt-get -y clean \
+    rm -rf /var/lib/apt/lists/*
     
 
 # Set the working directory to jboss' user home directory

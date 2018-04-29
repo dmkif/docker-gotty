@@ -18,9 +18,10 @@ before_install:
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker run --rm --privileged multiarch/qemu-user-static:register
+    - touch "qemu-${ARCH}-static
     - cp /usr/bin/qemu-*-static .
-    - ls -la
-    - docker build --compress -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
+    -  sed 's/$__{ARCH}/${ARCH}ls/g' Dockerfile > Dockerfile.${ARCH}
+    - docker build --compress --squash -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
    - docker images dmkif/gotty-"${ARCH}"
