@@ -1,6 +1,6 @@
-FROM $__{ARCH}/debian:jessie
+FROM @@ARCH@@/debian:jessie
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
-COPY ./qemu-$__{ARCH}-static /usr/bin/qemu-$__{ARCH}-static
+COPY ./qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
 # Install packages necessary to run EAP
 RUN uname -a  
 RUN apt-get update && \

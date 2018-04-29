@@ -20,7 +20,7 @@ before_install:
     - docker run --rm --privileged multiarch/qemu-user-static:register
     - touch qemu-"${ARCH}"-static
     - cp /usr/bin/qemu-*-static .
-    -  sed 's/$__{ARCH}/"${ARCH}"/g' Dockerfile > Dockerfile."${ARCH}"
+    - sed s/'@@ARCH@@'/${ARCH}/g Dockerfile > Dockerfile."${ARCH}"
     - docker build --compress --squash -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
