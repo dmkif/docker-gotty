@@ -9,7 +9,7 @@ env:
     - ARCH=amd64
 before_install:
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
-    - sudo systemctl restart docker
+    - sudo service docker restart
     - docker build --compress -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
