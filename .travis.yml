@@ -1,14 +1,5 @@
 sudo: required
-
-addons:
-  apt:
-    packages:
-    - qemu 
-    - qemu-user-static 
-    - qemu-user
-    - qemu-system-s390x   
-    - binfmt-support
-
+ 
 services:
  - docker
 
@@ -17,6 +8,8 @@ env:
     - ARCH=s390x
     - ARCH=amd64
 before_install:
+    # prepare qemu
+    - docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - sudo update-binfmts --enable qemu-"${ARCH}"
