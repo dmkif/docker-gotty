@@ -8,10 +8,10 @@ env:
     - ARCH=s390x
     - ARCH=amd64
 before_install:
-    # prepare qemu
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - cp /usr/bin/qemu-*-static .
     - docker build --compress -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
 
 script:
