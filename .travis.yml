@@ -36,10 +36,12 @@ after_script:
    docker push "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
    fi 
  - docker push ${REPO}-${ARCH}:${TAG}
+ - docker logout
 
 after_success:
  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
  - sudo service docker restart
+ - docker login -u $DOCKER_USER -p $DOCKER_PASSWORT
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
    docker manifest create "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
    docker manifest push "${REPO}";
