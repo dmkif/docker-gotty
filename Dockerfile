@@ -1,4 +1,4 @@
-FROM @@ARCH@@/golang:latest
+FROM @@ARCH@@/golang:stretch
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
 COPY ./qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
 # Install packages necessary to run EAP
@@ -44,8 +44,6 @@ RUN groupadd -r gotty -g 1000 && useradd -u 1000 -r -g gotty -m -d /opt/gotty -s
     chmod 755 /opt/gotty
 
 WORKDIR /opt/gotty
-
-# install latest gotty via go
 RUN go get github.com/yudai/gotty
 
 USER gotty
