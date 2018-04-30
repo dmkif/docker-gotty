@@ -6,8 +6,7 @@ addons:
   apt:
     packages:
     - qemu 
-    - qemu-user-static 
-    - qemu-user 
+    - build-dep 
     - binfmt-support
     
 env:
@@ -18,10 +17,16 @@ env:
     - ARCH=s390x
     - ARCH=amd64
 before_install:
+    - git clone git://git.qemu.org/qemu.git
+    - cd qemu
+    - touch qemu-"${ARCH}"
+    - git submodule update --init --recursive
+    - ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
+    - make -j8 && make install
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-    - touch qemu-"${ARCH}"-static
+    - touch qemu-"${ARCH}"
     - cp /usr/bin/qemu-*-static .
     - sed s/'@@ARCH@@'/${ARCH}/g Dockerfile > Dockerfile."${ARCH}"
     - docker version
