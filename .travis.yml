@@ -28,12 +28,12 @@ script:
 after_success:
  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
-   docker tag $REPO-$ARCH:$TAG $REPO-$ARCH:$TRAVIS_BUILD_NUMBER;
-   docker push $REPO-$ARCH:$TRAVIS_BUILD_NUMBER;
+   docker tag "${REPO}-${ARCH}:${TAG}" "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
+   docker push "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
    fi 
- - docker push $REPO-$ARCH:$TAG
+ - docker push ${REPO}-${ARCH}:${TAG}
 
 after_script:
- - docker manifest create --amend $REPO $REPO-s390x $REPO-amd64
- - docker manifest push $REPO
+ - docker manifest create --amend "${REPO}" "${REPO}-s390x" "${REPO}-amd64"
+ - docker manifest push "${REPO}"
  - docker logout

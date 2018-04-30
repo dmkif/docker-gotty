@@ -15,14 +15,13 @@ WORKDIR /tmp/
 
 #download and install berkley-db in right version
 RUN apt-get update && \
-    apt-get -y install autoconf build-essential checkinstall && \
+    apt-get -y install autoconf build-essential && \
     curl -sLk https://download.oracle.com/berkeley-db/db-4.8.30.NC.tar.gz | tar xz && \
     cd db-4.8.30.NC/build_unix && \
-    ../dist/configure --enable-cxx --prefix=/usr && make -j8 && \
-    checkinstall --fstrans=no --pkgversion=4.8.30 --pkgname=libdb4.8-dev --nodoc -y && \
+    ../dist/configure --enable-cxx --prefix=/usr && make install && make clean && \
     cd /tmp/ && \
     rm -rf * && \
-    apt-get -y --purge autoremove autoconf build-essential checkinstall && \
+    apt-get -y --purge autoremove autoconf build-essential && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/*
 
