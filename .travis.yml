@@ -1,9 +1,9 @@
 sudo: required
 services:
 - docker
-language: bash
 
 env: 
+  language: bash
   global:
   - COMMIT=${TRAVIS_COMMIT::8}
   - REPO=dmkif/gotty   
@@ -22,4 +22,18 @@ before_install:
 script:
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
   - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
-  - docker images dmkif/gotty-"${ARCH}"
+  - docker tag 
+  - docker images "${REPO}-${ARCH}:${TAG}"
+
+after_success:
+ - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+ - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
+   docker tag $REPO-$ARCH:$TAG $REPO-$ARCH:$TRAVIS_BUILD_NUMBER;
+   docker push $REPO-$ARCH:$TRAVIS_BUILD_NUMBER;
+   fi 
+ - docker push $REPO-$ARCH:$TAG
+
+after_script:
+ - docker manifest create --amend $REPO $REPO-s390x $REPO-amd64
+ - docker manifest push $REPO
+ - docker logout
