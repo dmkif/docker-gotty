@@ -1,5 +1,4 @@
-sudo: required
- 
+sudo: required 
 services:
  - docker
 addons:
@@ -10,9 +9,6 @@ addons:
     - binfmt-support
     
 env:
- - os: linux
-      dist: trusty
-      sudo: required
   matrix:
     - ARCH=s390x
     - ARCH=amd64
