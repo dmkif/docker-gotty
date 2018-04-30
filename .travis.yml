@@ -22,11 +22,15 @@ script:
   - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+  - echo $TAG
+  - echo ${TAG}
+  - echo {{REPO}}
+  - echo REPO
   - travis_wait docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
   - docker images "${REPO}-${ARCH}:${TAG}"
 
 after_script:
- - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORT}
+ - docker login -u $DOCKER_USER -p $DOCKER_PASSWORT
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
    docker tag "${REPO}"-"${ARCH}":"${TAG}" "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
    docker push "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
@@ -37,10 +41,10 @@ after_success:
  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
  - sudo service docker restart
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
-   docker manifest create --amend "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
+   docker manifest create "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
    docker manifest push "${REPO}";
    else
-   docker manifest create --amend "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-s390x:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-amd64:${TRAVIS_PULL_REQUEST_BRANCH}";
+   docker manifest create "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-s390x:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-amd64:${TRAVIS_PULL_REQUEST_BRANCH}";
    docker manifest push "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}";
    fi
  - docker logout
