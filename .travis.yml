@@ -5,7 +5,7 @@ addons:
   apt:
     packages:
     - qemu 
-    - build-dep 
+    - build-essential 
     - binfmt-support
     
 env:
