@@ -1,29 +1,32 @@
 sudo: required
-
 services:
-    - docker
-
+- docker
+language: bash
 global:
    - COMMIT="${TRAVIS_COMMIT::8}"
    - REPO=dmkif/gotty 
-
 env:   
 matrix:
     - ARCH=s390x
     - ARCH=amd64
 before_install:
-    - sudo apt update && sudo apt -y install qemu build-essential binfmt-support
-    - git clone git://git.qemu.org/qemu.git
-    - cd qemu
-    - git submodule update --init --recursive
-    - ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
-    - make -j8 && make install
-    - cd ..
-    - touch qemu-user-static/qemu-"${ARCH}"
+    - sudo apt update && sudo apt -y install qemu binfmt-support
+    #- git clone git://git.qemu.org/qemu.git
+    #- cd qemu
+    #- git submodule update --init --recursive
+    #- ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
+    #- make -j8 && make install
+    #- cd ..
+    #- touch qemu-user-static/qemu-"${ARCH}"
     - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
+    - sudo update-binfmts --enable s390x
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - mkdir qemu-user-static
+    - cp /usr/bin/qemu-*-static qemu-user-static/
     - sed s/"@@ARCH@@"/${ARCH}/g Dockerfile > Dockerfile.s390x
+    # prepare qemu
+    - docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - docker build --compress --squash -t dmkif/gotty-und -f Dockerfile.s390x .
     - docker version
 script:

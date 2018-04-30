@@ -1,6 +1,6 @@
 FROM @@ARCH@@/golang:stretch
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
-COPY ./qemu-user-static/qemu-@@ARCH@@ /usr/bin/qemu-@@ARCH@@-static
+COPY ./qemu-user-static/qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
 # Install packages necessary to run EAP
 USER root
 RUN apt-get update && \
