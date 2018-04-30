@@ -10,7 +10,7 @@ matrix:
     - ARCH=s390x
     - ARCH=amd64
 before_install:
-    - sudo apt update && sudo apt -y install qemu binfmt-support
+    - sudo apt update && sudo apt -y install qemu binfmt-support qemu-user-static
     #- git clone git://git.qemu.org/qemu.git
     #- cd qemu
     #- git submodule update --init --recursive
