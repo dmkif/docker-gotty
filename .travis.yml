@@ -15,11 +15,11 @@ env:
 before_install:
     - git clone git://git.qemu.org/qemu.git
     - cd qemu
-    - mkdir qemu-"@{ARCH}"-linux-user && touch qemu-"@{ARCH}"-linux-user/qemu-"${ARCH}"
     - git submodule update --init --recursive
     - ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
     - make -j8 && make install
     - cd ..
+    - touch qemu-user-static/qemu-"${ARCH}"
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
