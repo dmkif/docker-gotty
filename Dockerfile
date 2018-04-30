@@ -1,4 +1,4 @@
-FROM @@ARCH@@/debian:jessie
+FROM @@ARCH@@/debian:latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
 COPY ./qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
 # Install packages necessary to run EAP
