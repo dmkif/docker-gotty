@@ -24,7 +24,6 @@ before_install:
     - sed s/'@@ARCH@@'/${ARCH}/g Dockerfile > Dockerfile."${ARCH}"
     - docker version
 
-script:
-   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`  
-   - docker build --compress --squash -t "${REPO}-"${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
+script: 
+   - docker build --compress --squash -t "${REPO}-"${ARCH}" -f Dockerfile."${ARCH}" .
    - docker images dmkif/gotty-"${ARCH}"
