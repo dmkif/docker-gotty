@@ -22,12 +22,12 @@ script:
   - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
   - sudo service docker restart
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
-  - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
+  - travis_wait docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
   - docker tag 
   - docker images "${REPO}-${ARCH}:${TAG}"
 
 after_script:
- - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+ - docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
    docker tag "${REPO}-${ARCH}:${TAG}" "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
    docker push "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
