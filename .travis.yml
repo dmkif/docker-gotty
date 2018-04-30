@@ -25,7 +25,7 @@ before_install:
     - mkdir qemu-user-static
     - which qemu-s390x-static
     #- cp /usr/bin/qemu-*-static qemu-user-static/
-    - sed s/"@@ARCH@@"/${ARCH}/g Dockerfile > Dockerfile.s390x
+    - sed s/"@@ARCH@@"/"s390x"/g Dockerfile > Dockerfile.s390x
     # prepare qemu
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - docker build --compress --squash -t dmkif/gotty-und -f Dockerfile.s390x .
