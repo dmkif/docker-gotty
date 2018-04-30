@@ -37,6 +37,11 @@ after_script:
 after_success:
  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
  - sudo service docker restart
- - docker manifest create --amend "${REPO}" "${REPO}-s390x" "${REPO}-amd64"
- - docker manifest push "${REPO}"
+ - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
+   docker manifest create --amend "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
+   docker manifest push "${REPO}";
+   else
+   docker manifest create --amend "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-s390x:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-amd64:${TRAVIS_PULL_REQUEST_BRANCH}";
+   docker manifest push "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}";
+   fi
  - docker logout
