@@ -20,7 +20,7 @@ before_install:
     #- touch qemu-user-static/qemu-"${ARCH}"
     - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
-    - sudo update-binfmts --enable s390x
+    #- sudo update-binfmts --enable s390x
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
     - mkdir qemu-user-static
     - cp /usr/bin/qemu-*-static qemu-user-static/
