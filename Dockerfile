@@ -6,7 +6,7 @@ USER root
 RUN apt-get update && \
     apt-get -y install curl tar xterm libncurses5-dev libgmp-dev && \
     apt-get -y autoremove && \
-    apt-get -y clean \
+    apt-get -y clean && \ 
     rm -rf /var/lib/apt/lists/*
     
 
