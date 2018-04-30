@@ -25,5 +25,5 @@ before_install:
     - docker version
 
 script: 
-   - docker build --compress --squash -t "${REPO}-"${ARCH}" -f Dockerfile."${ARCH}" .
+   - docker build --compress --squash -t "${REPO}-${ARCH}" -f Dockerfile."${ARCH}" .
    - docker images dmkif/gotty-"${ARCH}"
