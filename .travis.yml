@@ -15,15 +15,14 @@ env:
 before_install:
     - git clone git://git.qemu.org/qemu.git
     - cd qemu
-    - touch qemu-"${ARCH}"
+    - mkdir qemu-"@{ARCH}"-linux-user && touch qemu-"@{ARCH}"-linux-user/qemu-"${ARCH}"
     - git submodule update --init --recursive
     - ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
     - make -j8 && make install
+    - cd ..
     - echo '{"experimental":true}' | sudo tee /etc/docker/daemon.json
     - sudo service docker restart
     - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-    - ls -la && pwd
-    - touch qemu-"${ARCH}"
     - sed s/'@@ARCH@@'/${ARCH}/g Dockerfile > Dockerfile."${ARCH}"
     - docker version
     - sudo docker build --compress --squash -t dmkif/gotty-"${ARCH}" -f Dockerfile."${ARCH}" .
