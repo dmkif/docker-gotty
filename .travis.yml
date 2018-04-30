@@ -4,30 +4,30 @@ services:
     - docker
 
 env:
-    global:
-        - COMMIT="${TRAVIS_COMMIT::8}"
-        - REPO=dmkif/gotty
+global:
+   - COMMIT="${TRAVIS_COMMIT::8}"
+   - REPO=dmkif/gotty
     
-    matrix:
-        - ARCH=s390x
-        - ARCH=amd64
+matrix:
+    - ARCH=s390x
+    - ARCH=amd64
     
-    before_install:
-        - sudo apt update && sudo apt -y install qemu build-essential binfmt-support
-        - git clone git://git.qemu.org/qemu.git
-        - cd qemu
-        - git submodule update --init --recursive
-        - ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
-        - make -j8 && make install
-        - cd ..
-        - touch qemu-user-static/qemu-"${ARCH}"
-        - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-        - sudo service docker restart
-        - docker run --rm --privileged multiarch/qemu-user-static:register --reset
-        - sed s/"@@ARCH@@"/${ARCH}/g Dockerfile > Dockerfile."${ARCH}"
-        - docker version
-    
-    script:
-        - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
-        - docker build --compress --squash -t "${REPO}-"${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
-        - docker images dmkif/gotty-"${ARCH}"
+before_install:
+    - sudo apt update && sudo apt -y install qemu build-essential binfmt-support
+    - git clone git://git.qemu.org/qemu.git
+    - cd qemu
+    - git submodule update --init --recursive
+    - ./configure --prefix=$(cd ..; pwd)/qemu-user-static --static --disable-system --enable-linux-user
+    - make -j8 && make install
+    - cd ..
+    - touch qemu-user-static/qemu-"${ARCH}"
+    - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+    - sudo service docker restart
+    - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    - sed s/"@@ARCH@@"/${ARCH}/g Dockerfile > Dockerfile."${ARCH}"
+    - docker version
+   
+script:
+    - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+    - docker build --compress --squash -t "${REPO}-"${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
+    - docker images dmkif/gotty-"${ARCH}"
