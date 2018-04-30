@@ -5,8 +5,7 @@ services:
 env: 
   language: bash
   global:
-  - COMMIT=${TRAVIS_COMMIT::8}
-  - REPO=dmkif/gotty   
+  - COMMIT=${TRAVIS_COMMIT::8} 
   matrix:
   - ARCH=s390x
   - ARCH=amd64
@@ -20,12 +19,14 @@ before_install:
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
 script:
+  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+  - sudo service docker restart
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
   - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
   - docker tag 
   - docker images "${REPO}-${ARCH}:${TAG}"
 
-after_success:
+after_script:
  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
    docker tag "${REPO}-${ARCH}:${TAG}" "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
@@ -33,7 +34,9 @@ after_success:
    fi 
  - docker push ${REPO}-${ARCH}:${TAG}
 
-after_script:
+after_success:
+ - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+ - sudo service docker restart
  - docker manifest create --amend "${REPO}" "${REPO}-s390x" "${REPO}-amd64"
  - docker manifest push "${REPO}"
  - docker logout
