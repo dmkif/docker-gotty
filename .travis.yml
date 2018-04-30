@@ -23,14 +23,13 @@ script:
   - sudo service docker restart
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
   - travis_wait docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
-  - docker tag 
   - docker images "${REPO}-${ARCH}:${TAG}"
 
 after_script:
- - docker login -u ${DOCKER_USER} -p ${DOCKER_PASS}
+ - docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORT}
  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
-   docker tag "${REPO}-${ARCH}:${TAG}" "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
-   docker push "${REPO}-${ARCH}:${TRAVIS_BUILD_NUMBER}";
+   docker tag "${REPO}"-"${ARCH}":"${TAG}" "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
+   docker push "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
    fi 
  - docker push ${REPO}-${ARCH}:${TAG}
 
