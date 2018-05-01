@@ -1,4 +1,8 @@
-FROM @@ARCH@@/golang:stretch
+FROM golang:alpine AS gotty
+RUN apk update && apk add git && go get github.com/yudai/gotty && \
+    env GOARCH=@@ARCH@@ go build github.com/yudai/gotty
+
+FROM @@ARCH@@/debian:latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
 COPY ./qemu-user-static/qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
 # Install packages necessary to run EAP
@@ -42,14 +46,17 @@ RUN apt-get update && \
 RUN groupadd -r gotty -g 1000 && useradd -u 1000 -r -g gotty -m -d /opt/gotty -s /sbin/nologin -c "Gotty user" gotty && \
     chmod 755 /opt/gotty
 
+# Remove the binary. It's unused in the final result
+RUN rm -f /usr/bin/qemu-@@ARCH@@-static
 WORKDIR /opt/gotty
-RUN go get github.com/yudai/gotty
 
+COPY --from=gotty /go/bin/gotty .
 USER gotty
 
 EXPOSE 8081
 
 # Execute Gotty
-ENTRYPOINT ["gotty"]
+ENTRYPOINT ["./gotty"]
 #Default arguments ...
 CMD ["--port","8081","/bin/bash"]
+
