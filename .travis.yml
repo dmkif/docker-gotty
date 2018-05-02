@@ -7,9 +7,17 @@ services:
 env: 
   - ARCH=s390x
   - ARCH=amd64
+
+before_install:
+  - sudo add-apt-repository ppa:jacob/virtualisation -y
+  - sudo apt-get update
+  - sudo apt-get upgrade -y
+  - sudo apt-get -y install binfmt-support qemu qemu-user-static 
  
 install:
-  - sudo apt update && sudo apt -y install binfmt-support qemu-user-static
+  - git clone git://git.qemu-project.org/qemu.git
+  - cd qemu
+  - git submodule update --init --recursive
   - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
   - sudo curl -fsSL https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64 -o /usr/bin/docker
   - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
@@ -19,6 +27,7 @@ install:
   - sudo mkdir -p /lib/binfmt.d
   - sudo cp qemu-static-conf/*.conf /lib/binfmt.d/
   - sudo /etc/init.d/binfmt-support restart
+  - sudo cat /proc/sys/fs/binfmt_misc/status
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
 before_script:
