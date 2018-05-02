@@ -5,12 +5,11 @@ services:
 - docker
 
 env: 
- stage: build docker
   - ARCH=s390x
   - ARCH=amd64
 
 before_install:
- - sudo add-apt-repository ppa:adapt/ppa -y  
+  - sudo add-apt-repository ppa:adapt/ppa -y  
   - sudo apt-get update
   - sudo apt-get -y install binfmt-support adapt lxd
   - sudo adapt install -r bionic -p qemu-user-static
