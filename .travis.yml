@@ -11,7 +11,6 @@ env:
 before_install:
   - sudo add-apt-repository ppa:jacob/virtualisation -y
   - sudo apt-get update
-  - sudo apt-get upgrade -y
   - sudo apt-get -y install binfmt-support qemu qemu-user-static 
  
 install:
@@ -48,7 +47,7 @@ after_script:
 
 jobs:
  include:
-  -stage: Deploy Manifest
+  -stage: deploy manifest
   if: branch = master
   script: 
    - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
