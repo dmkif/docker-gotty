@@ -1,53 +1,14 @@
-sudo: required
-services:
-- docker
-
-env: 
-  language: bash
-  global:
-  - COMMIT=${TRAVIS_COMMIT::8} 
-  matrix:
-  - ARCH=s390x
+env:
   - ARCH=amd64
- 
-before_install:
-  - sudo apt update && sudo apt -y install qemu binfmt-support qemu-user-static
-  - touch qemu-user-static/qemu-"${ARCH}"-static
-  - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
-  - sudo curl -fsSL https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64 -o /usr/bin/docker
-  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-  - sudo service docker restart
-  - sed s/"@@ARCH@@"/"${ARCH}"/g Dockerfile > Dockerfile."${ARCH}"
-  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  - ARCH=s390x
 
-script:
-  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-  - sudo service docker restart
-  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
-  - echo $TAG
-  - echo ${TAG}
-  - echo {{REPO}}
-  - echo REPO
-  - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
-  - docker images "${REPO}-${ARCH}:${TAG}"
+before_script: echo "before"$ARCH
+script: echo $ARCH
+after_script: echo "after"$ARCH
 
-after_script:
- - docker login -u $DOCKER_USER -p $DOCKER_PASSWORT
- - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
-   docker tag "${REPO}"-"${ARCH}":"${TAG}" "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
-   docker push "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
-   fi 
- - docker push ${REPO}-${ARCH}:${TAG}
- - docker logout
-after_success:
- - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
- - sudo service docker restart
- - docker login -u $DOCKER_USER -p $DOCKER_PASSWORT
- - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
-   docker manifest create "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
-   docker manifest push "${REPO}";
-   else
-   docker manifest create "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-s390x:${TRAVIS_PULL_REQUEST_BRANCH}" "${REPO}-amd64:${TRAVIS_PULL_REQUEST_BRANCH}";
-   docker manifest push "${REPO}:${TRAVIS_PULL_REQUEST_BRANCH}";
-   fi
- - docker logout
+jobs:
+  include:
+    - stage: deploy manifest
+      env: ARCH=s390x
+      script: echo Deploy
+      
