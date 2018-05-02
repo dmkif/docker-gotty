@@ -48,7 +48,7 @@ after_script:
   - docker logout
 
 jobs:
- inlcude:
+ include:
   -stage: Deploy Manifest
   if: branch = master
   script: 
