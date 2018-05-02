@@ -36,7 +36,7 @@ before_script:
 script:
   - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
   - docker images "${REPO}-${ARCH}:${TAG}"
-  - docker run --entrypoint "uname" -t "${REPO}-${ARCH}:${TAG} -a
+  - docker run --entrypoint "uname" -t "${REPO}-${ARCH}:${TAG}" -a
 
 after_script:
   - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
