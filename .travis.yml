@@ -1,14 +1,62 @@
-env:
-  - ARCH=amd64
-  - ARCH=s390x
+sudo: required
+dist: trusty
 
-before_script: echo "before"$ARCH
-script: echo $ARCH
-after_script: echo "after"$ARCH
+services:
+- docker
+
+stages:
+  - Build docker container
+  - Deploy Manifest
+    
+env: 
+ language: bash
+ matrix:
+  - ARCH=s390x
+  - ARCH=amd64
+ 
+ install:
+  - sudo apt update && sudo apt -y install qemu binfmt-support qemu-user-static
+  - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
+  - sudo curl -fsSL https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64 -o /usr/bin/docker
+  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+  - sudo service docker restart
+  - sed s/"@@ARCH@@"/"${ARCH}"/g Dockerfile > Dockerfile."${ARCH}"
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  - mkdir qemu-user-static
+  - if [ $ARCH == "amd64" ]; then
+     curl -fsSL https://github.com/multiarch/qemu-user-static/releases/download/v2.11.0/qemu-aarch64-static -o qemu-user-static/qemu-x86_64-static || travis_terminate 1;
+    else
+     curl -fsSL https://github.com/multiarch/qemu-user-static/releases/download/v2.11.0/qemu-$ARCH-static -o qemu-user-static/qemu-$ARCH-static || travis_terminate 1;
+    fi
+
+ before_script:
+  - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
+
+ script:
+  - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
+  - docker images "${REPO}-${ARCH}:${TAG}"
+
+ after_script:
+ - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
+ - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
+   docker tag "${REPO}"-"${ARCH}":"${TAG}" "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
+   docker push "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
+   fi 
+ - docker push ${REPO}-${ARCH}:${TAG}
+ - docker logout
 
 jobs:
-  include:
-    - stage: deploy manifest
-      env: ARCH=s390x
-      script: echo Deploy
-      
+ inlcude:
+  -stage: Deploy Manifest
+  if: branch = master
+  script: 
+   - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+   - sudo service docker restart
+   - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
+   - docker pull "${REPO}-s390x";
+   - docker pull "${REPO}-amd64";
+   - docker manifest create "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
+   - docker manifest annotate --arch=$ARCH --os=linux 
+   - docker manifest push "${REPO}";
+   - docker manifest inspect $REPO
+   - docker logout

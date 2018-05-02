@@ -4,7 +4,7 @@ RUN apk update && apk add git && go get github.com/yudai/gotty && \
 
 FROM @@ARCH@@/debian:latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
-COPY ./qemu-user-static/qemu-@@ARCH@@-static /usr/bin/qemu-@@ARCH@@-static
+COPY ./qemu-user-static/qemu-*-static /usr/bin/
 # Install packages necessary to run EAP
 USER root
 RUN apt-get update && \
