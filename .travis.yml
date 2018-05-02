@@ -21,7 +21,7 @@ install:
   - if [[ $ARCH != "amd64" ]]; then
     sed -i s/"@@ARCH_2@@"/"@@ARCH@@"/g Dockerfile;
     fi 
-  - sed - s/"@@ARCH_2@@"/"x86_64"/g Dockerfile"
+  - sed -i s/"@@ARCH_2@@"/"x86_64"/g Dockerfile
   - sed s/"@@ARCH@@"/"${ARCH}"/g Dockerfile > Dockerfile."${ARCH}"
   - git clone https://github.com/computermouth/qemu-static-conf.git
   - sudo mkdir -p /lib/binfmt.d
