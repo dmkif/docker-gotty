@@ -23,9 +23,13 @@ install:
   - mkdir qemu-user-static
   - if [ $ARCH == "amd64" ]; then
      curl -fsSL https://github.com/multiarch/qemu-user-static/releases/download/v2.11.0/qemu-aarch64-static -o qemu-user-static/qemu-x86_64-static || travis_terminate 1;
+     echo "amd";
     else
      curl -fsSL https://github.com/multiarch/qemu-user-static/releases/download/v2.11.0/qemu-$ARCH-static -o qemu-user-static/qemu-$ARCH-static || travis_terminate 1;
+     echo $ARCH
     fi
+  - echo "downloaded files:"
+  - ls qemu-user-static
 
 before_script:
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`

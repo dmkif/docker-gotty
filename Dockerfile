@@ -47,7 +47,7 @@ RUN groupadd -r gotty -g 1000 && useradd -u 1000 -r -g gotty -m -d /opt/gotty -s
     chmod 755 /opt/gotty
 
 # Remove the binary. It's unused in the final result
-RUN rm -f /usr/bin/qemu-@@ARCH@@-static
+RUN rm -f /usr/bin/qemu-*-static
 WORKDIR /opt/gotty
 
 COPY --from=gotty /go/bin/gotty .
