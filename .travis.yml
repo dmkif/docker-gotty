@@ -5,14 +5,15 @@ services:
 - docker
 
 env: 
+ stage: build docker
   - ARCH=s390x
   - ARCH=amd64
 
 before_install:
+ - sudo add-apt-repository ppa:adapt/ppa -y  
   - sudo apt-get update
-  - sudo apt-get -y install binfmt-support
-  - curl -fsSL http://archive.ubuntu.com/ubuntu/pool/universe/q/qemu/qemu-user-static_2.11+dfsg-1ubuntu7_amd64.deb -o qemu-user-static.deb
-  - sudo apt install -f -y ./qemu-user-static.deb
+  - sudo apt-get -y install binfmt-support adapt lxd
+  - sudo adapt install -r bionic -p qemu-user-static
 
  
 install:
