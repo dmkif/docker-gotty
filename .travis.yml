@@ -9,7 +9,7 @@ env:
   - ARCH=amd64
  
 install:
-  - sudo apt update && sudo apt -y install qemu binfmt-support qemu-user-static
+  - sudo apt update && sudo apt -y install binfmt-support
   - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
   - sudo curl -fsSL https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64 -o /usr/bin/docker
   - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
@@ -18,7 +18,7 @@ install:
   - git clone https://github.com/computermouth/qemu-static-conf.git
   - sudo mkdir -p /lib/binfmt.d
   - sudo cp qemu-static-conf/*.conf /lib/binfmt.d/
-  - sudo systemctl restart systemd-binfmt.service
+  - sudo /etc/init.d/binfmt-support restart
 
 before_script:
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
