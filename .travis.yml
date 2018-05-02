@@ -36,6 +36,7 @@ before_script:
 script:
   - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
   - docker images "${REPO}-${ARCH}:${TAG}"
+  - docker run --entrypoint "uname" -t "${REPO}-${ARCH}:${TAG} -a
 
 after_script:
   - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
@@ -54,10 +55,11 @@ jobs:
    - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
    - sudo service docker restart
    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
-   - docker pull "${REPO}-s390x";
-   - docker pull "${REPO}-amd64";
-   - docker manifest create "${REPO}" "${REPO}-s390x" "${REPO}-amd64";
-   - docker manifest annotate --arch=$ARCH --os=linux 
-   - docker manifest push "${REPO}";
+   - docker pull "${REPO}-s390x-${TRAVIS_BUILD_NUMBER}";
+   - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}";
+   - docker manifest create "${REPO}" "${REPO}-s390x-${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}";
+   - docker manifest annotate --arch=s390x --os=linux "${REPO}" "${REPO}-s390x-${TRAVIS_BUILD_NUMBER}"
+   - docker manifest annotate --arch=amd64 --os=linux "${REPO}" "${REPO}-amd64-${TRAVIS_BUILD_NUMBER}"
+   - docker manifest push REPO
    - docker manifest inspect $REPO
    - docker logout
