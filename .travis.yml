@@ -9,10 +9,14 @@ env:
   - ARCH=amd64
 
 before_install:
+  - cat <<eof >/etc/apt/sources.list.d/squeeze.list
+    deb http://ftp.be.debian.org/debian/ bionic  main contrib
+    deb-src http://security.debian.org/ squeeze/updates main contrib
+    eof
   - sudo apt-get update
   - sudo apt-get -y install binfmt-support
   - curl -fsSL http://archive.ubuntu.com/ubuntu/pool/universe/q/qemu/qemu-user-static_2.11+dfsg-1ubuntu7_amd64.deb -o emu-user-static.deb
-  - sudo dpkg --force-all -i qemu-user-static.deb
+  - sudo apt install -f -y ./qemu-user-static.deb
 
  
 install:
