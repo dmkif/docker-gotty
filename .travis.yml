@@ -13,7 +13,7 @@ before_install:
   - sudo add-apt-repository ppa:ubuntu-lxc/stable -y 
   - sudo apt-get update
   - sudo apt-get -y install binfmt-support adapt lxd
-  - sudo adapt install -r bionic -p qemu-user-static
+  - sudo adapt install -r artful -p qemu-user-static
 
  
 install:
