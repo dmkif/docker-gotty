@@ -26,7 +26,7 @@ install:
      echo "amd";
     else
      curl -fsSL https://github.com/multiarch/qemu-user-static/releases/download/v2.11.0/qemu-$ARCH-static -o qemu-user-static/qemu-$ARCH-static || travis_terminate 1;
-     echo $ARCH
+     echo $ARCH;
     fi
   - echo "downloaded files:"
   - ls qemu-user-static
