@@ -4,7 +4,6 @@ RUN apk update && apk add git && go get github.com/yudai/gotty && \
 
 FROM @@ARCH@@/debian:latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
-ADD qemu-user-static /usr/bin/
 # Install packages necessary to run EAP
 USER root
 RUN apt-get update && \
@@ -47,7 +46,6 @@ RUN groupadd -r gotty -g 1000 && useradd -u 1000 -r -g gotty -m -d /opt/gotty -s
     chmod 755 /opt/gotty
 
 # Remove the binary. It's unused in the final result
-RUN rm -f /usr/bin/qemu-*-static
 WORKDIR /opt/gotty
 
 COPY --from=gotty /go/bin/gotty .
