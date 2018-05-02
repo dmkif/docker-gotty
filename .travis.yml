@@ -10,7 +10,7 @@ env:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get -y install binfmt-support build-dep qemu
+  - sudo apt-get -y install binfmt-support build-essential qemu
   - git clone git://git.qemu.org/qemu.git
   - cd qemu
   - git submodule update --init --recursive
