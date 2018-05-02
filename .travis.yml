@@ -11,12 +11,7 @@ env:
 before_install:
   - sudo apt-get update
   - sudo apt-get -y install binfmt-support build-essential qemu
-  - sudo cp qemu-user-static/ /usr/ -f
-
-
-
-
-
+  - sudo cp -r qemu-user-static/* /usr/ -v
  
 install:
   - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
