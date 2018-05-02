@@ -10,9 +10,23 @@ env:
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get -y install binfmt-support
-  - curl -fsSL http://archive.ubuntu.com/ubuntu/pool/universe/q/qemu/qemu-user-static_2.11+dfsg-1ubuntu7_amd64.deb -o qemu-user-static.deb
-  - sudo dpkg -x qemu-user-static.deb /
+  - sudo apt-get -y install binfmt-support build-dep qemu
+  - git clone git://git.qemu.org/qemu.git
+  - cd qemu
+  - git submodule update --init --recursive
+  - ./configure \
+    --prefix=$(cd ..; pwd)/qemu-user-static \
+    --static \
+    --disable-system \
+    --enable-linux-user
+  - make -j8 && make install
+  - cd ../qemu-user-static/bin
+  - for i in *; do cp $i $i-static; done
+  - sudo cp qemu-*-static /usr/lib/
+
+
+
+
 
  
 install:
