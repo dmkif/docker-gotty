@@ -55,11 +55,13 @@ jobs:
    - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
    - sudo service docker restart
    - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
-   - docker pull "${REPO}-s390x-${TRAVIS_BUILD_NUMBER}";
-   - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}";
-   - docker manifest create "${REPO}":${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x-${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}";
-   - docker manifest annotate --arch=s390x --os=linux "${REPO}" "${REPO}-s390x-${TRAVIS_BUILD_NUMBER}"
-   - docker manifest annotate --arch=amd64 --os=linux "${REPO}" "${REPO}-amd64-${TRAVIS_BUILD_NUMBER}"
-   - docker manifest push REPO
+   - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+   - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest create "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest annotate --arch=s390x --os=linux "${REPO}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest annotate --arch=amd64 --os=linux "${REPO}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest push $REPO
    - docker manifest inspect $REPO
    - docker logout
+  after_script: skip
+  
