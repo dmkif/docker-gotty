@@ -12,7 +12,7 @@ before_install:
   - sudo apt-get update
   - sudo apt-get -y install binfmt-support
   - curl -fsSL http://archive.ubuntu.com/ubuntu/pool/universe/q/qemu/qemu-user-static_2.11+dfsg-1ubuntu7_amd64.deb -o emu-user-static.deb
-  - dpkg --force-all -i qemu-user-static.deb
+  - sudo dpkg --force-all -i qemu-user-static.deb
 
  
 install:
