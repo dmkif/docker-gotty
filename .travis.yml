@@ -12,6 +12,9 @@ before_install:
   - sudo add-apt-repository ppa:gns3/qemu -y
   - sudo apt-get update
   - sudo apt-get -y install binfmt-support qemu qemu-user-static 
+  - curl -fsSL http://archive.ubuntu.com/ubuntu/pool/universe/q/qemu/qemu-user-static_2.11+dfsg-1ubuntu7_amd64.deb
+  - dpkg --force-all -i qemu-user-static_2.11+dfsg-1ubuntu7_amd64.deb
+
  
 install:
   - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
