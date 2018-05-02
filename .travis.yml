@@ -58,10 +58,10 @@ jobs:
    - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
    - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
    - docker manifest create "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest annotate --arch=s390x --os=linux "${REPO}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest annotate --arch=amd64 --os=linux "${REPO}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest push $REPO
-   - docker manifest inspect $REPO
+   - docker manifest annotate --arch=s390x --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest annotate --arch=amd64 --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest push "${REPO}:${TRAVIS_BUILD_NUMBER}"
+   - docker manifest inspect "${REPO}:${TRAVIS_BUILD_NUMBER}"
    - docker logout
   after_script: skip
   
