@@ -19,6 +19,7 @@ install:
   - sudo mkdir -p /lib/binfmt.d
   - sudo cp qemu-static-conf/*.conf /lib/binfmt.d/
   - sudo /etc/init.d/binfmt-support restart
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
 before_script:
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`

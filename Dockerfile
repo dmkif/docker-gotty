@@ -45,7 +45,6 @@ RUN apt-get update && \
 RUN groupadd -r gotty -g 1000 && useradd -u 1000 -r -g gotty -m -d /opt/gotty -s /sbin/nologin -c "Gotty user" gotty && \
     chmod 755 /opt/gotty
 
-# Remove the binary. It's unused in the final result
 WORKDIR /opt/gotty
 
 COPY --from=gotty /go/bin/gotty .
