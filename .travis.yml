@@ -1,5 +1,6 @@
 sudo: required
 dist: trusty
+language: bash
 
 services:
 - docker
@@ -7,74 +8,27 @@ services:
 env: 
   - ARCH=s390x
   - ARCH=amd64
-
-before_install:
-  - sudo apt-get update
-  - sudo apt-get -y install binfmt-support build-essential qemu
-  - sudo cp -r qemu-user-static/* /usr/ -v
  
 install:
-  - sudo cp /usr/bin/docker /usr/bin/docker-cli.bak
-  - sudo curl -fsSL https://github.com/clnperez/cli/releases/download/1.0/docker-linux-amd64 -o /usr/bin/docker
-  - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-  - sudo service docker restart
-  - if [[ $ARCH != "amd64" ]]; then
-    sed -i s/"@@ARCH_2@@"/"@@ARCH@@"/g Dockerfile;
-    fi 
-  - sed -i s/"@@ARCH_2@@"/"x86_64"/g Dockerfile
-  - sed s/"@@ARCH@@"/"${ARCH}"/g Dockerfile > Dockerfile."${ARCH}"
-  - git clone https://github.com/computermouth/qemu-static-conf.git
-  - sudo mkdir -p /lib/binfmt.d
-  - sudo cp qemu-static-conf/*.conf /lib/binfmt.d/
-  - sudo /etc/init.d/binfmt-support restart
-  - sudo cat /proc/sys/fs/binfmt_misc/status
-  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+  - sh ./build_environment.sh
 
 before_script:
   - export TAG=`if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then echo "latest"; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi`
 
 script:
+  - sh ./build_dockerfile.sh
   - travis_wait 60 docker build --compress --squash -t "${REPO}-${ARCH}:${TAG}" -f Dockerfile."${ARCH}" .
   - docker images "${REPO}-${ARCH}:${TAG}"
   - docker run --entrypoint "uname" -t "${REPO}-${ARCH}:${TAG}" -a
-
-after_script:
-  - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
-  - if [[ $TRAVIS_PULL_REQUEST == "false" ]] && [[ $TRAVIS_BRANCH == "master" ]]; then
-    docker tag "${REPO}"-"${ARCH}":"${TAG}" "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
-    docker push "${REPO}"-"${ARCH}":"${TRAVIS_BUILD_NUMBER}";
-    fi 
-  - docker push ${REPO}-${ARCH}:${TAG}
-  - docker logout
+  - sh ./deploy_container.sh
 
 jobs:
   include:
     - stage: deploy manifest
+      env: PUBTAG=${TRAVIS_BUILD_NUMBER}
+      script: bash ./deploy_manifest.sh
+    - stage: deploy manifest latest
       if: branch = master
       env: PUBTAG=latest
-      script: 
-      - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-      - sudo service docker restart
-      - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
-      - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-      - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest create "${REPO}:${PUBTAG}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest annotate --arch=s390x --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest annotate --arch=amd64 --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest inspect "${REPO}:${PUBTAG}"
-      - docker manifest push -p "${REPO}:${PUBTAG}"
-      - docker logout
-    - stage: deploy manifest
-      env: PUBTAG=${TRAVIS_BUILD_NUMBER}
-      script: 
-      - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-      - sudo service docker restart
-      - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
-      - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-      - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest create "${REPO}:${PUBTAG}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest annotate --arch=s390x --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest annotate --arch=amd64 --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-      - docker manifest inspect "${REPO}:${PUBTAG}"
-      - docker manifest push -p "${REPO}:${PUBTAG}"
-      - docker logout
+      script: bash ./deploy_manifest.sh
+    
