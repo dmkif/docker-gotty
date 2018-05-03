@@ -48,20 +48,33 @@ after_script:
   - docker logout
 
 jobs:
- include:
-  stage: deploy manifest
-  if: branch = master
-  script: 
-   - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
-   - sudo service docker restart
-   - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
-   - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-   - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest create "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest annotate --arch=s390x --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest annotate --arch=amd64 --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest push "${REPO}:${TRAVIS_BUILD_NUMBER}"
-   - docker manifest inspect "${REPO}:${TRAVIS_BUILD_NUMBER}"
-   - docker logout
-  after_script: skip
-  
+  include:
+    - stage: deploy manifest
+      if: branch = master
+      env: PUBTAG=latest
+      script: 
+      - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+      - sudo service docker restart
+      - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
+      - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+      - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest create "${REPO}:${PUBTAG}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest annotate --arch=s390x --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest annotate --arch=amd64 --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest inspect "${REPO}:${PUBTAG}"
+      - docker manifest push -p "${REPO}:${PUBTAG}"
+      - docker logout
+    - stage: deploy manifest
+      env: PUBTAG=${TRAVIS_BUILD_NUMBER}
+      script: 
+      - echo "{\"experimental\":true}" | sudo tee /etc/docker/daemon.json
+      - sudo service docker restart
+      - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORT"
+      - docker pull "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+      - docker pull "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest create "${REPO}:${PUBTAG}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest annotate --arch=s390x --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-s390x:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest annotate --arch=amd64 --os=linux "${REPO}:${TRAVIS_BUILD_NUMBER}" "${REPO}-amd64:${TRAVIS_BUILD_NUMBER}"
+      - docker manifest inspect "${REPO}:${PUBTAG}"
+      - docker manifest push -p "${REPO}:${PUBTAG}"
+      - docker logout
