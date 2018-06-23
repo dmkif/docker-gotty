@@ -5,7 +5,7 @@ RUN apk update && apk add git && go get github.com/yudai/gotty && \
 FROM @@ARCH@@/debian:latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
 ADD qemu-user-static/bin/qemu-@@ARCH_2@@-static /usr/bin/qemu-@@ARCH_2@@-static
-# Install packages necessary to run EAP
+# Install packages necessary to run Wildfly
 USER root
 RUN apt-get update && \
     apt-get -y install curl tar xterm libncurses5-dev libgmp-dev && \
@@ -34,7 +34,7 @@ RUN apt-get update && \
 RUN apt-get update && \
     apt-get -y install autoconf build-essential && \
     curl -sLk https://sourceforge.net/projects/open-cobol/files/gnu-cobol/3.0/gnucobol-3.0-rc1.tar.gz | tar xz && \
-    cd gnucobol-3.0-rc1 && ./configure --prefix=/usr --info-dir=/usr/share/info && make && make install && ldconfig && cd /tmp/ && rm -rf * && \
+    cd gnucobol-3.0-rc1 && ./configure --prefix=/usr --infodir=/usr/share/info && make && make install && ldconfig && cd /tmp/ && rm -rf * && \
     apt-get -y --purge autoremove autoconf build-essential && \
     apt-get -y clean && \
     rm -rf /var/lib/apt/lists/*
