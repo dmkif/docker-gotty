@@ -1,5 +1,5 @@
-FROM golang:alpine AS gotty
-RUN apk update && apk add git && go get github.com/yudai/gotty && \
+FROM golang:latest AS gotty
+RUN go get github.com/yudai/gotty && \
     env GOARCH=@@ARCH@@ go build github.com/yudai/gotty
 
 FROM @@ARCH@@/debian:latest
