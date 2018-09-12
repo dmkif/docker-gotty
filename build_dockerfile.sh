@@ -1,7 +1,5 @@
 #!/bin/bash
 case $ARCH in
-    amd64) goarch="x86_64"
-           ;;
     i386) goarch="386" 
           ;;
     armhf) goarch="arm"
