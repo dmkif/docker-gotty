@@ -6,8 +6,13 @@ services:
 - docker
 
 env: 
+  - ARCH=ppc64el
+  - ARCH=armhf
+  - ARCH=arm64
   - ARCH=s390x
   - ARCH=amd64
+  - ARCH=i386
+
  
 install:
   - sh ./build_environment.sh

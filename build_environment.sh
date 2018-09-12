@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #Update Repository and install requirements
 sudo apt-get update
 sudo apt-get -y install binfmt-support build-essential qemu
@@ -17,3 +17,4 @@ sudo cp qemu-static-conf/*.conf /lib/binfmt.d/
 sudo /etc/init.d/binfmt-support restart
 sudo cat /proc/sys/fs/binfmt_misc/status
 docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
