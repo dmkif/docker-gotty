@@ -1,17 +1,26 @@
 #!/bin/bash
 case $ARCH in
-    i386) goarch="386" 
+    i386) qemu_arch=$ARCH 
+          go_arch="386"
           ;;
-    armhf) goarch="arm"
-           ;;
-    ppc64el) goarch="ppc64le"
-             ;;
-    arm64v8) goarch="aarch64"
-             ;;
-    *) goarch=$ARCH
+    amd64) qemu_arch="x86_64" 
+           go_arch=$ARCH
+          ;;
+    arm32v7) qemu_arch="arm" 
+             go_arch="arm"
+          ;;
+    arm64v8) qemu_arch="aarch64" 
+             go_arch="arm64"
+          ;;
+    ppc64el) qemu_arch="ppc64le" 
+             go_arch="ppc64le"
+          ;;
+    *) qemu_arch=$ARCH
+       go_arch=$ARCH
        ;;
 esac
 
-sed s/"@@ARCH_2@@"/"$goarch"/g Dockerfile > Dockerfile.$ARCH
-sed -i s/"@@ARCH@@"/"$ARCH"/g Dockerfile.$ARCH
+sed s/"@@ARCH@@"/"$ARCH"/g Dockerfile > Dockerfile.$ARCH
+sed -i s/"@@QEMU_ARCH@@"/"$qemu_arch"/g Dockerfile.$ARCH
+sed -i s/"@@GO_ARCH@@"/"$go_arch"/g Dockerfile.$ARCH
 

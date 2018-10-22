@@ -1,6 +1,6 @@
 FROM golang:latest AS gotty
 RUN go get github.com/yudai/gotty && \
-    env GOARCH=@@ARCH_2@@ go build github.com/yudai/gotty
+    env GOARCH=@@GO_ARCH@@ go build github.com/yudai/gotty
 
 FROM dmkif/gnucobol:@@ARCH@@-latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
