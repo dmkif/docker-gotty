@@ -8,10 +8,10 @@ services:
 env: 
   - ARCH=amd64
   - ARCH=i386
-  - ARCH=armhf
-  - ARCH=arm64
+  - ARCH=arm32v7
+  - ARCH=arm64v8
   - ARCH=s390x
-  - ARCH=ppc64el
+  - ARCH=ppc64le
 
 install:
   - sh ./build_environment.sh
@@ -27,11 +27,11 @@ jobs:
     - stage: deploy manifest
       env:
         - PUBTAG=${TRAVIS_BUILD_NUMBER}
-        - ARCH="amd64 i386 armhf arm64 s390x ppc64el"
+        - ARCH="amd64 i386 arm32v7 arm64v8 s390x ppc64le"
       script: bash ./deploy_manifest.sh
     - stage: deploy manifest latest
       if: branch = master
       env:
         - PUBTAG=latest
-        - ARCH="amd64 i386 armhf arm64 s390x ppc64el"
+        - ARCH="amd64 i386 arm32v7 arm64v8 s390x ppc64le"
       script: bash ./deploy_manifest.sh
