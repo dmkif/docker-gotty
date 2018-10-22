@@ -11,7 +11,7 @@ COPY --from=gotty /go/bin/linux_@@GO_ARCH@@/gotty .
 EXPOSE 8081
 
 # Execute Gotty
-#ENTRYPOINT ["./gotty"]
+ENTRYPOINT ["./gotty"]
 #Default arguments ...
-#CMD ["--port","8081","--permit-write","/bin/bash"]
+CMD ["--port","8081","--permit-write","/bin/bash"]
 
