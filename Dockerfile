@@ -1,12 +1,12 @@
 FROM golang:latest AS gotty
-RUN export GOOS=linux && export GOARCH=@@GO_ARCH@@ && go get github.com/yudai/gotty
+RUN export GOOS=linux && export GOARCH=@@GO_ARCH@@ && go get github.com/yudai/gotty && go build -o gotty github.com/yudai/gotty
 
 FROM dmkif/gnucobol:@@ARCH@@-latest
 MAINTAINER Daniel Mulzer <daniel.mulzer@fau.de>
 
 WORKDIR /opt/cobol
 
-COPY --from=gotty /go/bin/linux_@@GO_ARCH@@/gotty .
+COPY --from=gotty /go/gotty .
 
 EXPOSE 8081
 
